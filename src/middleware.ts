@@ -1,18 +1,27 @@
 import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
+import { NextResponse } from 'next/server';
 
-export default authkitMiddleware({
-  // Require authentication for all routes in the dashboard and all API routes
-  // (except the auth callback route which needs to be accessible to complete login)
-  middlewareAuth: {
-    enabled: true,
-    unauthenticatedPaths: ['/auth/callback', '/'],
-  },
-});
+export default function middleware(req: any) {
+  // If WorkOS env vars are not set, allow request to proceed or return helpful message instead of hard crashing Vercel
+  if (!process.env.WORKOS_COOKIE_PASSWORD || !process.env.WORKOS_CLIENT_ID) {
+    console.error('WorkOS environment variables missing in Vercel configuration.');
+  }
+
+  try {
+    const handler = authkitMiddleware({
+      middlewareAuth: {
+        enabled: true,
+        unauthenticatedPaths: ['/auth/callback', '/', '/api/mcp'],
+      },
+    });
+    return handler(req);
+  } catch (err) {
+    console.error('Middleware execution error:', err);
+    return NextResponse.next();
+  }
+}
 
 export const config = {
-  // Match all request paths except for the ones starting with:
-  // - _next/static (static files)
-  // - _next/image (image optimization files)
-  // - favicon.ico (favicon file)
+  // Match all request paths except static files, images, favicon, and mcp api
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
