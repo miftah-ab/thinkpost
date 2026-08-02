@@ -4,6 +4,7 @@ import type { NextRequest, NextFetchEvent } from 'next/server';
 
 // Initialize the WorkOS handler
 const workosMiddleware = authkitMiddleware({
+  redirectUri: process.env.WORKOS_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
   middlewareAuth: {
     enabled: true,
     unauthenticatedPaths: ['/auth/callback', '/', '/api/mcp'],
