@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getCurrentSession, getSignInUrl } from '@/lib/auth/session';
+import { getCurrentSession } from '@/lib/auth/session';
 import Link from 'next/link';
 
 export default async function HomePage() {
@@ -7,27 +7,6 @@ export default async function HomePage() {
 
   if (session?.user) {
     redirect('/profile');
-  }
-
-  let signInUrl = '#';
-  let errorMessage = '';
-  try {
-    signInUrl = await getSignInUrl();
-  } catch (err) {
-    console.error("GET_SIGN_IN_URL_ERROR:", err);
-    errorMessage = err instanceof Error ? err.message : String(err);
-  }
-
-  if (errorMessage) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 p-8">
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-6 max-w-2xl text-left">
-          <h2 className="text-xl font-bold mb-2">AuthKit Setup Error</h2>
-          <p className="font-mono text-sm break-all">{errorMessage}</p>
-          <p className="mt-4 text-sm text-gray-500">Please check your Vercel Environment Variables.</p>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -49,7 +28,7 @@ export default async function HomePage() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href={signInUrl}
+            href="/profile"
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:shadow-indigo-500/40 hover:scale-105"
           >
             Get Started
